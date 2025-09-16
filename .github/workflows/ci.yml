@@ -36,6 +36,24 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Install PostgreSQL client (pg_isready, psql)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres to be ready
+        env:
+          PGPASSWORD: test
+        run: |
+          for i in {1..60}; do
+            if pg_isready -h localhost -p 5432 -U test -d testdb; then
+              echo "pg_isready OK"
+              psql "postgresql://test:$(printf %q "$PGPASSWORD")@localhost:5432/testdb" -c "SELECT 1;" && exit 0
+            fi
+            echo "Waiting for Postgres... ($i)"; sleep 2
+          done
+          echo "Postgres did not become ready in time"; exit 1
+
       - name: Build and test with Maven
         run: mvn -B -V clean verify
         env:
@@ -43,3 +61,13 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
           SPRING_DATASOURCE_USERNAME: test
           SPRING_DATASOURCE_PASSWORD: test
+
+      - name: Upload surefire reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: |
+            target/surefire-reports
+            target/failsafe-reports
+          if-no-files-found: ignore
