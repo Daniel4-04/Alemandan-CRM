@@ -66,6 +66,13 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <!-- Si Spring Boot no te gestiona la versión automáticamente, usa la misma que trae Boot -->
+            <version>${flyway.version}</version>
+        </dependency>
+
         <!-- Thymeleaf extras para etiquetas de seguridad -->
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
@@ -109,6 +116,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Dependency postgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
