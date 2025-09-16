@@ -17,3 +17,5 @@ Aplicación Spring Boot (Java 21) con:
 ```
 
 Abrir: http://localhost:8080
+
+[![CI](https://github.com/Daniel4-04/Alemandan-CRM/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Daniel4-04/Alemandan-CRM/actions/workflows/ci.yml)
