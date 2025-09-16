@@ -36,18 +36,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Wait for Postgres
-        run: |
-          for i in {1..60}; do
-            if pg_isready -h localhost -p 5432 -U test -d testdb; then
-              echo "Postgres is ready"; exit 0
-            fi
-            echo "Waiting for Postgres... ($i)"; sleep 2
-          done
-          echo "Postgres did not become ready in time"; exit 1
-        env:
-          PGPASSWORD: test
-
       - name: Build and test with Maven
         run: mvn -B -V clean verify
         env:
