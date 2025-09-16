@@ -29,8 +29,7 @@ public class CustomerService {
             Customer saved = repository.save(c);
             return toResponse(saved);
         } catch (DataIntegrityViolationException e) {
-            // Deja que el ControllerAdvice lo traduzca a 409
-            throw e;
+            throw e; // Lo traduce el RestExceptionHandler a 409
         }
     }
 
