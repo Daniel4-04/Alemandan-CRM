@@ -70,4 +70,98 @@ class CustomerControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].email").value("ada@example.com"));
     }
+
+    @Test
+    @WithMockUser
+    void testPaginatedCustomers() throws Exception {
+        // Create multiple customers for pagination testing
+        var customer1 = """
+                {
+                  "name": "Alice Smith",
+                  "email": "alice@example.com",
+                  "phone": "+1 555 0101"
+                }
+                """;
+        var customer2 = """
+                {
+                  "name": "Bob Johnson",
+                  "email": "bob@example.com",
+                  "phone": "+1 555 0102"
+                }
+                """;
+        var customer3 = """
+                {
+                  "name": "Charlie Brown",
+                  "email": "charlie@example.com",
+                  "phone": "+1 555 0103"
+                }
+                """;
+
+        // Create customers
+        mvc.perform(post("/api/customers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(customer1)
+                        .with(csrf()))
+                .andExpect(status().isCreated());
+
+        mvc.perform(post("/api/customers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(customer2)
+                        .with(csrf()))
+                .andExpect(status().isCreated());
+
+        mvc.perform(post("/api/customers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(customer3)
+                        .with(csrf()))
+                .andExpect(status().isCreated());
+
+        // Test pagination with page=0, size=2
+        mvc.perform(get("/api/customers/page")
+                        .param("page", "0")
+                        .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.first").value(true))
+                .andExpect(jsonPath("$.last").value(false));
+
+        // Test pagination with page=1, size=2
+        mvc.perform(get("/api/customers/page")
+                        .param("page", "1")
+                        .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.first").value(false))
+                .andExpect(jsonPath("$.last").value(true));
+
+        // Test sorting by name ascending
+        mvc.perform(get("/api/customers/page")
+                        .param("page", "0")
+                        .param("size", "3")
+                        .param("sort", "name,asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Alice Smith"))
+                .andExpect(jsonPath("$.content[1].name").value("Bob Johnson"))
+                .andExpect(jsonPath("$.content[2].name").value("Charlie Brown"));
+
+        // Test sorting by name descending
+        mvc.perform(get("/api/customers/page")
+                        .param("page", "0")
+                        .param("size", "3")
+                        .param("sort", "name,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Charlie Brown"))
+                .andExpect(jsonPath("$.content[1].name").value("Bob Johnson"))
+                .andExpect(jsonPath("$.content[2].name").value("Alice Smith"));
+    }
 }
