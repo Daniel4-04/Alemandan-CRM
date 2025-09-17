@@ -5,6 +5,8 @@ import com.alemandan.crm.customer.dto.CustomerCreateRequest;
 import com.alemandan.crm.customer.dto.CustomerResponse;
 import com.alemandan.crm.customer.dto.CustomerUpdateRequest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,11 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public List<CustomerResponse> list() {
         return repository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CustomerResponse> listPage(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toResponse);
     }
 
     public CustomerResponse update(Long id, CustomerUpdateRequest req) {

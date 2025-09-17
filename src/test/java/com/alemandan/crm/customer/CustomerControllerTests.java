@@ -14,8 +14,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,18 +34,6 @@ class CustomerControllerTests {
                     .withDatabaseName("testdb")
                     .withUsername("test")
                     .withPassword("test");
-
-    @DynamicPropertySource
-    static void containerProps(DynamicPropertyRegistry registry) {
-        // Conexión al contenedor
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-
-        // Asegurar que Flyway migre y Hibernate no valide/cree
-        registry.add("spring.flyway.enabled", () -> true);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
-    }
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper om;

@@ -1,16 +1,29 @@
 # Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
-
-# IntelliJ IDEA
-.idea/
-*.iml
-out/
+.mvn/timing.properties
 
 # Logs
-logs/
 *.log
+logs/
+hs_err_pid*
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Java
+*.class
+
+# Others
+.env
